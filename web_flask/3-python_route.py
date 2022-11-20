@@ -1,35 +1,33 @@
 #!/usr/bin/python3
-"""Simple Flask web application"""
+""" Starts a Flash Web Application Python is Cool"""
 from flask import Flask
-app = Flask('web_flask')
-app.url_map.strict_slashes = False
+app = Flask(__name__)
 
 
-@app.route('/')
-def hello_route1():
-    """Return 'Hello HBNB!'"""
+@app.route('/', strict_slashes=False)
+def hello_hbnb():
+    """ Prints a Message when / is called """
     return 'Hello HBNB!'
 
 
-@app.route('/hbnb')
-def hello_route2():
-    """Return 'HBNB'"""
+@app.route('/hbnb', strict_slashes=False)
+def hbnb():
+    """ Prints a Message when /hbnb is called """
     return 'HBNB'
 
 
-@app.route('/c/<text>')
-def hello_route3(text):
-    """Return 'C ' followed by text from html request"""
-    return 'C {}'.format(text.replace('_', ' '))
+@app.route('/c/<text>', strict_slashes=False)
+def c_is_fun(text):
+    """ Prints a Message when /c is called """
+    return "C " + text.replace('_', ' ')
 
 
-@app.route('/python/<text>')
-@app.route('/python/', defaults={'text': 'is cool'})
-def hello_route4(text):
-    """Return 'Python ' followed by text from html request with
-    default text 'is cool'"""
-    return 'Python {}'.format(text.replace('_', ' '))
-
+@app.route('/python', strict_slashes=False)
+@app.route('/python/<text>', strict_slashes=False)
+def python_is_cool(text='is_cool'):
+    """ Prints a Message when /python is called """
+    return "Python " + text.replace('_', ' ')
 
 if __name__ == "__main__":
+    """ Main Function """
     app.run(host='0.0.0.0', port=5000)

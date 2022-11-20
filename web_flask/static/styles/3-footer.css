@@ -1,29 +1,16 @@
-<<<<<<< HEAD
-/*
- * === Footer style ===
- */
-
-/* Footer style */
-footer {
-  align-items: center;
-  background-color: #fff;
-  border-top: 1px solid #ccc;
-  bottom: 0;
-  display: flex;
-  height: 60px;
-  justify-content: center;
-  position: absolute;
-  width: 100%;
-=======
 footer {
     position: fixed;
-    bottom: 0;
-    width: 100%;
-    background-color: white;
+    background: white;
     height: 60px;
+    width: 100%;
+    bottom: 0;
     border-top: 1px solid #CCCCCC;
-    display: flex;
-    justify-content: center;
-    align-items: center;
->>>>>>> 212529db4b955a72d996660137790c2497399ff5
+}
+footer p {
+    position: absolute;
+    text-align: center;
+    top: 10%;
+    bottom: 0;
+    right: 0;
+    left: 0;
 }

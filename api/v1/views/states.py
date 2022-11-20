@@ -1,76 +1,92 @@
 #!/usr/bin/python3
-"""
-States view for API
-"""
+""" objects that handle all default RestFul API actions for States """
+from models.state import State
+from models import storage
 from api.v1.views import app_views
-from flask import request, jsonify, abort
-from models import storage, state
+from flask import abort, jsonify, make_response, request
+from flasgger.utils import swag_from
 
 
 @app_views.route('/states', methods=['GET'], strict_slashes=False)
-def getallstate():
-    """Gets all states"""
-    res = []
-    for i in storage.all("State").values():
-        res.append(i.to_dict())
-
-    return jsonify(res)
+@swag_from('documentation/state/get_state.yml', methods=['GET'])
+def get_states():
+    """
+    Retrieves the list of all State objects
+    """
+    all_states = storage.all(State).values()
+    list_states = []
+    for state in all_states:
+        list_states.append(state.to_dict())
+    return jsonify(list_states)
 
 
 @app_views.route('/states/<state_id>', methods=['GET'], strict_slashes=False)
-def getstate(state_id=None):
-    """Gets a state"""
-    s = storage.get("State", state_id)
-    if s is None:
+@swag_from('documentation/state/get_id_state.yml', methods=['get'])
+def get_state(state_id):
+    """ Retrieves a specific State """
+    state = storage.get(State, state_id)
+    if not state:
         abort(404)
-    else:
-        return jsonify(s.to_dict())
+
+    return jsonify(state.to_dict())
 
 
 @app_views.route('/states/<state_id>', methods=['DELETE'],
                  strict_slashes=False)
-def deletestate(state_id=None):
-    """Deletes a state"""
-    s = storage.get("State", state_id)
-    if s is None:
+@swag_from('documentation/state/delete_state.yml', methods=['DELETE'])
+def delete_state(state_id):
+    """
+    Deletes a State Object
+    """
+
+    state = storage.get(State, state_id)
+
+    if not state:
         abort(404)
-    else:
-        storage.delete(obj)
-        storage.save()
-        return jsonify({}), 200
+
+    storage.delete(state)
+    storage.save()
+
+    return make_response(jsonify({}), 200)
 
 
 @app_views.route('/states', methods=['POST'], strict_slashes=False)
-def createstate():
-    """Create a state"""
-    s = request.get_json(silent=True)
-    if s is None:
-        abort(400, "Not a JSON")
-    elif "name" not in s.keys():
-        abort(400, "Missing name")
-    else:
-        new_s = state.State(**s)
-        storage.new(new_s)
-        storage.save()
-        return jsonify(new_s.to_dict()), 201
+@swag_from('documentation/state/post_state.yml', methods=['POST'])
+def post_state():
+    """
+    Creates a State
+    """
+    if not request.get_json():
+        abort(400, description="Not a JSON")
+
+    if 'name' not in request.get_json():
+        abort(400, description="Missing name")
+
+    data = request.get_json()
+    instance = State(**data)
+    instance.save()
+    return make_response(jsonify(instance.to_dict()), 201)
 
 
 @app_views.route('/states/<state_id>', methods=['PUT'], strict_slashes=False)
-def updatestate(state_id=None):
-    """Update a state"""
-    obj = storage.get("State", state_id)
-    if obj is None:
+@swag_from('documentation/state/put_state.yml', methods=['PUT'])
+def put_state(state_id):
+    """
+    Updates a State
+    """
+    state = storage.get(State, state_id)
+
+    if not state:
         abort(404)
 
-    s = request.get_json(silent=True)
-    if s is None:
-        abort(400, "Not a JSON")
-    else:
-        for k, v in s.items():
-            if k in ['id', 'created_at', 'updated_at']:
-                pass
-            else:
-                setattr(obj, k, v)
-        storage.save()
-        res = obj.to_dict()
-        return jsonify(res), 200
+    if not request.get_json():
+        abort(400, description="Not a JSON")
+
+    ignore = ['id', 'created_at', 'updated_at']
+
+    data = request.get_json()
+    for key, value in data.items():
+        if key not in ignore:
+            setattr(state, key, value)
+    storage.save()
+    return make_response(jsonify(state.to_dict()), 200)

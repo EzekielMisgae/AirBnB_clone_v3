@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" A script that starts a flask web application """
+""" Starts a Flash Web Application """
 from flask import Flask, render_template
 app = Flask(__name__)
 app.jinja_env.trim_blocks = True
@@ -32,7 +32,7 @@ def python_is_cool(text='is_cool'):
 
 
 @app.route('/number/<int:n>', strict_slashes=False)
-def n_is_number(n):
+def is_n_number(n):
     """ Prints a Message when /number is called only if n is an int"""
     return "{:d} is a number".format(n)
 
